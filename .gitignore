@@ -1,19 +1,19 @@
-# Python
+# Python / cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 *.egg-info/
 
-# Virtual envs
+# Virtual env
 .venv/
 venv/
 
-# SO / IDE
-.DS_Store
-Thumbs.db
+# IDE / SO
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
 
 # Logs
 *.log
