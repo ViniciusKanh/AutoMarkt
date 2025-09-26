@@ -14,14 +14,16 @@ load_dotenv()  # carrega .env em dev
 
 app = FastAPI(title="AutoMarkt API", version="1.0")
 
-# CORS: ajuste a origem conforme seu domínio do GitHub Pages
+ALLOWED_ORIGINS = (os.getenv("ALLOWED_ORIGINS") or "https://viniciuskanh.github.io").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # em produção, troque para ["https://seu-usuario.github.io"]
+    allow_origins=[o.strip() for o in ALLOWED_ORIGINS if o.strip()],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 class GenerateIn(BaseModel):
     provider: Literal["groq", "openai", "hf"] = "groq"
