@@ -26,8 +26,6 @@ AutoMarkt é um gerador de conteúdo orientado a marketing. Reúne uma interface
 * [Publicação do backend (Render/Railway)](#publicação-do-backend-renderrailway)
 * [Boas práticas de segurança](#boas-práticas-de-segurança)
 * [Solução de problemas](#solução-de-problemas)
-* [Roadmap](#roadmap)
-* [Licença](#licença)
 
 ---
 

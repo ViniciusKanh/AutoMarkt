@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -16,51 +17,620 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- CSS customizado -->
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* ===== RESET E VARIÁVEIS ===== */
+:root {
+    /* Cores principais */
+    --bg-primary: #05070e;
+    --bg-secondary: #0a0c14;
+    --bg-tertiary: #10141c;
+    
+    /* Cores de acento */
+    --accent-cyan: #00d4ff;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --accent-green: #10b981;
+    --accent-orange: #f59e0b;
+    
+    /* Cores de texto */
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0b0b0;
+    --text-muted: #8a8a8a;
+    
+    /* Cores de estado */
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+    
+    /* Sombras e efeitos */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    --shadow-neon: 0 0 30px rgba(0, 212, 255, 0.5);
+    --shadow-purple: 0 0 30px rgba(139, 92, 246, 0.5);
+    --shadow-glow: 0 0 15px rgba(255, 255, 255, 0.2);
+    
+    /* Bordas e raios */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+    
+    /* Transições */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    
+    /* Z-index */
+    --z-header: 100;
+    --z-modal: 1000;
+    --z-toast: 2000;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.font-mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.font-display {
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* ===== CANVAS E EFEITOS 3D ===== */
+#bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    pointer-events: none;
+}
+
+#particles-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+}
+
+/* ===== HEADER ===== */
+.main-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    background: linear-gradient(to right, rgba(10, 14, 26, 0.9), rgba(15, 20, 25, 0.9));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+}
+
+.header-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-mini {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.logo-mini-core {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    border-radius: 50%;
+    box-shadow: var(--shadow-neon);
+}
+
+.logo-mini-pulse {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--accent-cyan);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.brand-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.brand-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+}
+
+.brand-text {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.brand-version {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: rgba(0, 212, 255, 0.2);
+    padding: 0.2rem 0.4rem;
+    border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.brand-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Status indicators */
+.status-indicators {
+    display: flex;
+    gap: 1rem;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.status-online {
+    background: var(--success);
+    box-shadow: 0 0 12px var(--success);
+}
+
+.status-api {
+    background: var(--accent-cyan);
+    box-shadow: 0 0 12px var(--accent-cyan);
+}
+
+.status-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+    position: relative;
+    z-index: 1;
+    padding: 2rem 0;
+}
+
+.content-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
+/* ===== PANELS ===== */
+.control-panel,
+.output-panel {
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    transition: all var(--transition-normal);
+}
+
+.control-panel:hover,
+.output-panel:hover {
+    border-color: var(--accent-cyan);
+    box-shadow: var(--shadow-neon);
+    transform: translateY(-2px);
+}
+
+.panel-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.title-icon {
+    font-size: 1.1rem;
+}
+
+.panel-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.action-btn {
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn:hover {
+    background: var(--accent-purple);
+    color: var(--text-primary);
+    border-color: var(--accent-purple);
+    box-shadow: var(--shadow-purple);
+}
+
+.panel-content {
+    padding: 2rem;
+}
+
+/* Config sections */
+.config-section {
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.toggle-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: transform var(--transition-normal);
+}
+
+.toggle-btn.active {
+    transform: rotate(180deg);
+}
+
+.advanced-content,
+.ai-content {
+    display: none;
+}
+
+.advanced-content.expanded,
+.ai-content.expanded {
+    display: block;
+}
+
+/* Input fields */
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+.input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+.input-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.label-required {
+    color: var(--accent-pink);
+}
+
+.input-wrapper,
+.select-wrapper,
+.textarea-wrapper {
+    position: relative;
+}
+
+.modern-input,
+.modern-select,
+.modern-textarea {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all var(--transition-fast);
+    outline: none;
+}
+
+.modern-input:focus,
+.modern-select:focus,
+.modern-textarea:focus {
+    border-color: var(--accent-cyan);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.modern-select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+}
+
+.select-arrow {
+    position: absolute;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+}
+
+/* Checkboxes */
+.checkbox-group {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.modern-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.modern-checkbox input {
+    display: none;
+}
+
+.checkbox-mark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    background: var(--bg-secondary);
+    transition: all var(--transition-fast);
+    position: relative;
+}
+
+.checkbox-mark::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 12px;
+    border: solid var(--bg-primary);
+    border-width: 0 3px 3px 0;
+    transform: translate(-50%, -60%) rotate(45deg);
+    opacity: 0;
+    transition: opacity var(--transition-fast);
+}
+
+.modern-checkbox input:checked + .checkbox-mark {
+    background: var(--accent-cyan);
+    border-color: var(--accent-cyan);
+}
+
+.modern-checkbox input:checked + .checkbox-mark::after {
+    opacity: 1;
+}
+
+.checkbox-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Generate button */
+.generate-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--bg-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.generate-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-neon);
+}
+
+.generate-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-loader {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--bg-primary);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* ===== OUTPUT PANEL ===== */
+.output-content {
+    padding: 2rem;
+    font-size: 1rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    min-height: 400px;
+}
+
+.output-placeholder {
+    color: var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+.placeholder-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* ===== TOAST NOTIFICATIONS ===== */
+#toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: var(--z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.toast {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    color: #fff;
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    animation: toast-in 0.3s ease forwards;
+    border-left: 4px solid;
+}
+
+.toast.success {
+    background: var(--success);
+    border-color: #16a34a;
+}
+
+.toast.error {
+    background: var(--error);
+    border-color: #dc2626;
+}
+
+.toast.warning {
+    background: var(--warning);
+    border-color: #d97706;
+}
+
+.toast.info {
+    background: var(--info);
+    border-color: #2563eb;
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 0.5; }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes toast-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes toast-out {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+
+    </style>
 </head>
 <body>
-    <!-- Splash Screen Avançado -->
-    <div id="splash-screen" class="splash-screen">
-        <div class="splash-container">
-            <!-- Logo com animação complexa -->
-            <div class="logo-container">
-                <div class="logo-core">
-                    <div class="logo-ring ring-1"></div>
-                    <div class="logo-ring ring-2"></div>
-                    <div class="logo-ring ring-3"></div>
-                    <div class="logo-center">
-                        <div class="logo-symbol">AI</div>
-                    </div>
-                </div>
-                <div class="logo-particles"></div>
-            </div>
-            
-            <!-- Título com efeito glitch -->
-            <div class="splash-title">
-                <span class="glitch-text font-display" data-text="AutoMarkt">AutoMarkt</span>
-            </div>
-            
-            <!-- Subtítulo -->
-            <div class="splash-subtitle font-mono">
-                Inicializando sistema de IA...
-            </div>
-            
-            <!-- Barra de progresso -->
-            <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-                <div class="progress-text font-mono">0%</div>
-            </div>
-        </div>
-        
-        <!-- Efeito de escaneamento -->
-        <div class="scan-line"></div>
-        
-        <!-- Grid de fundo -->
-        <div class="grid-background"></div>
-    </div>
 
     <!-- Canvas para efeitos 3D -->
     <canvas id="bg-canvas"></canvas>
@@ -189,7 +759,6 @@
                                         <option value="inspirador">Inspirador</option>
                                         <option value="direto">Direto</option>
                                         <option value="descontraido">Descontraído</option>
-                                        <option value="tecnico">Técnico</option>
                                     </select>
                                     <div class="select-arrow">▼</div>
                                 </div>
@@ -316,13 +885,13 @@
                             <div class="input-row">
                                 <div class="input-group">
                                     <label for="provider" class="input-label">
-                                        <span class="label-text">Provider</span>
+                                        <span class="label-text">Provedor</span>
                                     </label>
                                     <div class="select-wrapper">
                                         <select id="provider" class="modern-select">
-                                            <option value="groq" selected>Groq (Rápido)</option>
-                                            <option value="openai">OpenAI (GPT)</option>
-                                            <option value="anthropic">Anthropic (Claude)</option>
+                                            <option value="groq" selected>Groq</option>
+                                            <option value="openai">OpenAI</option>
+                                            <option value="anthropic">Anthropic</option>
                                         </select>
                                         <div class="select-arrow">▼</div>
                                     </div>
@@ -346,69 +915,30 @@
                                         <span class="label-text">Max Tokens</span>
                                     </label>
                                     <div class="input-wrapper">
-                                        <input type="number" id="max-tokens" class="modern-input" 
-                                               value="512" min="100" max="4000">
+                                        <input type="number" id="max-tokens" class="modern-input" value="512">
                                         <div class="input-border"></div>
                                     </div>
                                 </div>
                                 
                                 <div class="input-group">
                                     <label for="temperature" class="input-label">
-                                        <span class="label-text">Temperature</span>
+                                        <span class="label-text">Temperatura</span>
+                                        <span class="slider-value">0.7</span>
                                     </label>
                                     <div class="slider-wrapper">
                                         <input type="range" id="temperature" class="modern-slider" 
                                                min="0" max="1" step="0.1" value="0.7">
-                                        <div class="slider-value">0.7</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Botões de Ação -->
-                    <div class="action-section">
-                        <button class="primary-btn" id="generate-btn">
-                            <span class="btn-icon">✨</span>
-                            <span class="btn-text">Gerar Conteúdo</span>
-                            <span class="btn-shortcut">Ctrl+Enter</span>
-                        </button>
-                        
-                        <div class="secondary-actions">
-                            <button class="secondary-btn" id="copy-md-btn">
-                                <span class="btn-icon">📋</span>
-                                <span class="btn-text">Copiar MD</span>
-                            </button>
-                            
-                            <button class="secondary-btn" id="copy-html-btn">
-                                <span class="btn-icon">🔗</span>
-                                <span class="btn-text">Copiar HTML</span>
-                            </button>
-                            
-                            <button class="secondary-btn" id="download-btn">
-                                <span class="btn-icon">💾</span>
-                                <span class="btn-text">Download</span>
-                            </button>
-                            
-                            <button class="ghost-btn" id="clear-btn">
-                                <span class="btn-icon">🗑️</span>
-                                <span class="btn-text">Limpar</span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- Loading State -->
-                    <div class="loading-section" id="loading-section" style="display: none;">
-                        <div class="loading-animation">
-                            <div class="loading-ring"></div>
-                            <div class="loading-ring"></div>
-                            <div class="loading-ring"></div>
-                        </div>
-                        <div class="loading-text">
-                            <span class="loading-message">Processando com IA...</span>
-                            <span class="loading-details">Analisando contexto e gerando conteúdo</span>
-                        </div>
-                    </div>
+                    <!-- Botão de Geração -->
+                    <button class="generate-btn" id="generate-btn">
+                        <span class="btn-text">Gerar Conteúdo</span>
+                        <div class="btn-loader" style="display: none;"></div>
+                    </button>
                 </div>
             </section>
             
@@ -417,60 +947,544 @@
                 <div class="panel-header">
                     <h2 class="panel-title">
                         <span class="title-icon">📄</span>
-                        Resultado Gerado
+                        Resultado
                     </h2>
                     <div class="panel-actions">
-                        <button class="action-btn" id="fullscreen-btn" title="Tela cheia">
-                            <span class="btn-icon">⛶</span>
+                        <button class="action-btn" id="copy-btn" title="Copiar resultado">
+                            <span class="btn-icon">📋</span>
                         </button>
-                        <button class="action-btn" id="export-btn" title="Exportar">
-                            <span class="btn-icon">📤</span>
+                        <button class="action-btn" id="download-btn" title="Baixar resultado">
+                            <span class="btn-icon">💾</span>
                         </button>
                     </div>
                 </div>
                 
-                <div class="output-content">
-                    <div class="output-placeholder" id="output-placeholder">
-                        <div class="placeholder-icon">🤖</div>
-                        <h3 class="placeholder-title">Pronto para gerar conteúdo</h3>
-                        <p class="placeholder-text">
-                            Configure os parâmetros ao lado e clique em "Gerar Conteúdo" 
-                            para criar conteúdo estratégico com inteligência artificial.
-                        </p>
-                    </div>
-                    
-                    <div class="output-result" id="output-result" style="display: none;">
-                        <div class="result-header">
-                            <div class="result-meta">
-                                <span class="meta-item">
-                                    <span class="meta-label">Gerado em:</span>
-                                    <span class="meta-value" id="generation-time">--</span>
-                                </span>
-                                <span class="meta-item">
-                                    <span class="meta-label">Tokens:</span>
-                                    <span class="meta-value" id="token-count">--</span>
-                                </span>
-                                <span class="meta-item">
-                                    <span class="meta-label">Modelo:</span>
-                                    <span class="meta-value" id="model-used">--</span>
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="result-content" id="result-content">
-                            <!-- Conteúdo gerado será inserido aqui -->
-                        </div>
+                <div class="panel-content output-content" id="output">
+                    <div class="output-placeholder">
+                        <div class="placeholder-icon">✨</div>
+                        <p>O conteúdo gerado aparecerá aqui.</p>
                     </div>
                 </div>
             </section>
         </div>
     </main>
 
-    <!-- Toast Notifications -->
-    <div id="toast-container" class="toast-container"></div>
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="script.js"></script>
+    <script>
+// ===== CONFIGURAÇÕES GLOBAIS =====
+const CONFIG = {
+    API_URL: localStorage.getItem('automarkt_api') || 'http://127.0.0.1:8000/generate',
+    ANIMATION_DURATION: 300,
+    TOAST_DURATION: 3000
+};
+
+// ===== ESTADO GLOBAL =====
+let state = {
+    isLoading: false,
+    lastGeneratedContent: '',
+    currentProvider: 'groq',
+    currentModel: 'llama-3.3-70b-versatile'
+};
+
+// ===== UTILITÁRIOS =====
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
+
+const debounce = (func, wait) => {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+};
+
+const throttle = (func, limit) => {
+    let inThrottle;
+    return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+            func.apply(context, args);
+            inThrottle = true;
+            setTimeout(() => inThrottle = false, limit);
+        }
+    }
+};
+
+// ===== SISTEMA DE TOAST =====
+class ToastManager {
+    constructor() {
+        this.container = $('#toast-container');
+        this.toasts = new Set();
+    }
+
+    show(message, type = 'info', duration = CONFIG.TOAST_DURATION) {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.textContent = message;
+        
+        this.container.appendChild(toast);
+        this.toasts.add(toast);
+
+        // Auto remove
+        setTimeout(() => {
+            this.remove(toast);
+        }, duration);
+
+        // Click to remove
+        toast.addEventListener('click', () => {
+            this.remove(toast);
+        });
+
+        return toast;
+    }
+
+    remove(toast) {
+        if (this.toasts.has(toast)) {
+            toast.style.animation = 'toast-out 0.3s ease forwards';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+                this.toasts.delete(toast);
+            }, 300);
+        }
+    }
+
+    success(message) {
+        return this.show(message, 'success');
+    }
+
+    error(message) {
+        return this.show(message, 'error');
+    }
+
+    warning(message) {
+        return this.show(message, 'warning');
+    }
+
+    info(message) {
+        return this.show(message, 'info');
+    }
+}
+
+const toast = new ToastManager();
+
+// ===== EFEITOS 3D E PARTÍCULAS =====
+class BackgroundEffects {
+    constructor() {
+        this.canvas = $('#bg-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.particles = [];
+        this.mouse = { x: 0, y: 0 };
+        
+        this.init();
+    }
+
+    init() {
+        this.resize();
+        this.createParticles();
+        this.bindEvents();
+        this.animate();
+    }
+
+    resize() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+    }
+
+    createParticles() {
+        const particleCount = Math.min(100, window.innerWidth / 10);
+        
+        for (let i = 0; i < particleCount; i++) {
+            this.particles.push({
+                x: Math.random() * this.canvas.width,
+                y: Math.random() * this.canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                size: Math.random() * 2 + 1,
+                opacity: Math.random() * 0.5 + 0.2,
+                color: Math.random() > 0.5 ? '#00d4ff' : '#8b5cf6'
+            });
+        }
+    }
+
+    bindEvents() {
+        window.addEventListener('resize', () => {
+            this.resize();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            this.mouse.x = e.clientX;
+            this.mouse.y = e.clientY;
+        });
+    }
+
+    animate() {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        this.particles.forEach((particle, index) => {
+            // Atualizar posição
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+
+            // Interação com mouse
+            const dx = this.mouse.x - particle.x;
+            const dy = this.mouse.y - particle.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 150) {
+                particle.vx -= dx / 5000;
+                particle.vy -= dy / 5000;
+            } else {
+                particle.vx *= 0.98;
+                particle.vy *= 0.98;
+            }
+
+            // Bordas
+            if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
+            if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+
+            // Desenhar
+            this.ctx.beginPath();
+            this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            this.ctx.fillStyle = particle.color;
+            this.ctx.globalAlpha = particle.opacity;
+            this.ctx.fill();
+        });
+
+        requestAnimationFrame(() => this.animate());
+    }
+}
+
+// ===== GERENCIADOR DE FORMULÁRIO =====
+class FormManager {
+    constructor() {
+        this.form = {
+            tema: $('#tema'),
+            tipo: $('#tipo'),
+            idioma: $('#idioma'),
+            tom: $('#tom'),
+            objetivo: $('#objetivo'),
+            plataforma: $('#plataforma'),
+            publico: $('#publico'),
+            comprimento_texto: $('#comprimento_texto'),
+            keywords: $('#keywords'),
+            cta: $('#cta'),
+            hashtags: $('#hashtags'),
+            emojis: $('#emojis'),
+            provider: $('#provider'),
+            model: $('#model'),
+            maxTokens: $('#max-tokens'),
+            temperature: $('#temperature')
+        };
+
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        this.loadSavedData();
+        this.setupValidation();
+    }
+
+    bindEvents() {
+        $('#advanced-toggle').addEventListener('click', () => this.toggleSection('advanced-content', 'advanced-toggle'));
+        $('#ai-toggle').addEventListener('click', () => this.toggleSection('ai-content', 'ai-toggle'));
+        
+        this.form.provider.addEventListener('change', (e) => this.updateModelOptions(e.target.value));
+        
+        // Salvar dados em tempo real
+        Object.values(this.form).forEach(input => {
+            if (input) {
+                input.addEventListener('change', () => this.saveData());
+            }
+        });
+
+        // Atualizar valor do slider
+        this.form.temperature.addEventListener('input', (e) => {
+            $('.slider-value').textContent = e.target.value;
+        });
+    }
+
+    toggleSection(contentId, toggleId) {
+        const content = $(`#${contentId}`);
+        const toggle = $(`#${toggleId}`);
+        
+        content.classList.toggle('expanded');
+        toggle.classList.toggle('active');
+    }
+
+    updateModelOptions(provider) {
+        const modelInput = this.form.model;
+        const models = {
+            groq: 'llama-3.3-70b-versatile',
+            openai: 'gpt-4-turbo-preview',
+            anthropic: 'claude-3-sonnet-20240229'
+        };
+
+        if (modelInput) {
+            modelInput.placeholder = models[provider] || 'Modelo padrão';
+        }
+
+        state.currentProvider = provider;
+    }
+
+    setupValidation() {
+        // Validação em tempo real
+        this.form.tema.addEventListener('input', (e) => {
+            const value = e.target.value.trim();
+            const wrapper = e.target.closest('.input-wrapper');
+            
+            if (value.length < 3) {
+                wrapper.classList.add('error');
+            } else {
+                wrapper.classList.remove('error');
+            }
+        });
+    }
+
+    saveData() {
+        const data = {};
+        Object.keys(this.form).forEach(key => {
+            const input = this.form[key];
+            if (input) {
+                data[key] = input.type === 'checkbox' ? input.checked : input.value;
+            }
+        });
+        
+        localStorage.setItem('automarkt_form_data', JSON.stringify(data));
+    }
+
+    loadSavedData() {
+        const saved = localStorage.getItem('automarkt_form_data');
+        if (saved) {
+            try {
+                const data = JSON.parse(saved);
+                Object.keys(data).forEach(key => {
+                    const input = this.form[key];
+                    if (input) {
+                        if (input.type === 'checkbox') {
+                            input.checked = data[key];
+                        } else {
+                            input.value = data[key];
+                        }
+                    }
+                });
+            } catch (e) {
+                console.warn('Erro ao carregar dados salvos:', e);
+            }
+        }
+    }
+
+    getData() {
+        const data = {};
+        Object.keys(this.form).forEach(key => {
+            const input = this.form[key];
+            if (input) {
+                data[key] = input.type === 'checkbox' ? input.checked : input.value;
+            }
+        });
+        return data;
+    }
+
+    reset() {
+        Object.values(this.form).forEach(input => {
+            if (input) {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            }
+        });
+        
+        // Valores padrão
+        this.form.objetivo.value = 'conversao';
+        this.form.cta.checked = true;
+        this.form.hashtags.checked = true;
+        this.form.provider.value = 'groq';
+        this.form.maxTokens.value = '512';
+        this.form.temperature.value = '0.7';
+        $('.slider-value').textContent = '0.7';
+        
+        localStorage.removeItem('automarkt_form_data');
+        toast.info('Formulário resetado');
+    }
+}
+
+// ===== GERENCIADOR DE API =====
+class APIManager {
+    constructor() {
+        this.baseURL = CONFIG.API_URL;
+    }
+
+    async generate(data) {
+        const payload = {
+            provider: data.provider || 'groq',
+            model: data.model || 'llama-3.3-70b-versatile',
+            tema: data.tema,
+            tipo: data.tipo,
+            idioma: data.idioma,
+            tom: data.tom,
+            objetivo: data.objetivo,
+            plataforma: data.plataforma,
+            publico: data.publico || 'geral',
+            comprimento_texto: data.comprimento_texto || 'médio',
+            incluir_cta: data.cta,
+            incluir_hashtags: data.hashtags,
+            inclir_emojis: data.emojis,
+            keywords: data.keywords,
+            max_tokens: parseInt(data.maxTokens) || 512,
+            temperature: parseFloat(data.temperature) || 0.7
+        };
+
+        try {
+            const response = await fetch(this.baseURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Erro na API');
+            }
+
+            return await response.json();
+
+        } catch (error) {
+            console.error('Erro na chamada da API:', error);
+            throw error;
+        }
+    }
+}
+
+// ===== APLICAÇÃO PRINCIPAL =====
+class App {
+    constructor() {
+        this.formManager = new FormManager();
+        this.apiManager = new APIManager();
+        this.outputElement = $('#output');
+        this.generateBtn = $('#generate-btn');
+        this.btnText = $('.btn-text');
+        this.btnLoader = $('.btn-loader');
+        
+        this.init();
+    }
+
+    init() {
+        this.bindEvents();
+        new BackgroundEffects();
+    }
+
+    bindEvents() {
+        this.generateBtn.addEventListener('click', () => this.handleGenerate());
+        $('#copy-btn').addEventListener('click', () => this.copyToClipboard());
+        $('#download-btn').addEventListener('click', () => this.downloadResult());
+        $('#reset-btn').addEventListener('click', () => this.formManager.reset());
+    }
+
+    async handleGenerate() {
+        if (state.isLoading) return;
+
+        const data = this.formManager.getData();
+
+        if (!data.tema || data.tema.trim().length < 3) {
+            toast.error('Por favor, insira um tema com pelo menos 3 caracteres.');
+            this.formManager.form.tema.focus();
+            return;
+        }
+
+        this.setLoading(true);
+
+        try {
+            const result = await this.apiManager.generate(data);
+            this.displayResult(result.content);
+            state.lastGeneratedContent = result.content;
+            toast.success('Conteúdo gerado com sucesso!');
+        } catch (error) {
+            this.displayError(error.message);
+            toast.error(`Erro ao gerar conteúdo: ${error.message}`);
+        } finally {
+            this.setLoading(false);
+        }
+    }
+
+    setLoading(isLoading) {
+        state.isLoading = isLoading;
+        this.generateBtn.disabled = isLoading;
+        this.btnText.style.display = isLoading ? 'none' : 'inline';
+        this.btnLoader.style.display = isLoading ? 'inline-block' : 'none';
+    }
+
+    displayResult(content) {
+        this.outputElement.innerHTML = ''; // Limpa o conteúdo anterior
+        const formattedContent = this.formatContent(content);
+        this.outputElement.appendChild(formattedContent);
+    }
+
+    formatContent(content) {
+        const container = document.createElement('div');
+        // Simplesmente insere o texto, para evitar problemas de formatação complexa
+        container.textContent = content;
+        return container;
+    }
+
+    displayError(message) {
+        this.outputElement.innerHTML = `
+            <div class="output-placeholder error">
+                <div class="placeholder-icon">❌</div>
+                <p><strong>Ocorreu um erro:</strong></p>
+                <p>${message}</p>
+            </div>
+        `;
+    }
+
+    copyToClipboard() {
+        if (!state.lastGeneratedContent) {
+            toast.warning('Nenhum conteúdo para copiar.');
+            return;
+        }
+
+        navigator.clipboard.writeText(state.lastGeneratedContent)
+            .then(() => toast.success('Conteúdo copiado para a área de transferência!'))
+            .catch(err => toast.error('Falha ao copiar conteúdo.'));
+    }
+
+    downloadResult() {
+        if (!state.lastGeneratedContent) {
+            toast.warning('Nenhum conteúdo para baixar.');
+            return;
+        }
+
+        const blob = new Blob([state.lastGeneratedContent], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `automarkt_${new Date().toISOString()}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+}
+
+// ===== INICIALIZAÇÃO =====
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar aplicação principal
+    window.app = new App();
+});
+
+    </script>
 </body>
 </html>
+
