@@ -1,13 +1,50 @@
 // ===== CONFIGURAÇÕES GLOBAIS =====
+// ===== CONFIGURAÇÕES GLOBAIS =====
+
+// 1) Compatibilidade com chave antiga: se existir automarkt_api (com /generate),
+//    converte para base e guarda em automarkt_api_base.
+(() => {
+  const legacy = localStorage.getItem('automarkt_api');
+  if (legacy && /\/generate\/?$/.test(legacy)) {
+    const base = legacy.replace(/\/generate\/?$/, '');
+    localStorage.setItem('automarkt_api_base', base);
+  }
+})();
+
+// 2) Define base de API preferindo o que estiver salvo; se estiver no GitHub Pages,
+//    usa por padrão o Space do HF; localmente usa 127.0.0.1.
+const DEFAULT_BASE = (() => {
+  const saved = (localStorage.getItem('automarkt_api_base') || '').trim();
+  if (saved) return saved;
+
+  const onPages = location.hostname.endsWith('github.io');
+  return onPages
+    ? 'https://ViniciusKhan-automarkt-backend.hf.space'  // <- seu Space
+    : 'http://127.0.0.1:8000';
+})();
+
+// 3) Normaliza e deriva endpoints.
+const API_BASE   = DEFAULT_BASE.replace(/\/+$/, '');
+const API_URL    = `${API_BASE}/generate`;
+const HEALTH_URL = `${API_BASE}/health`;
+
+// 4) Expõe config global.
 const CONFIG = {
-    API_URL: localStorage.getItem('automarkt_api') || 'http://127.0.0.1:8000/generate',
-    HEALTH_URL: localStorage.getItem('automarkt_api')
-        ? localStorage.getItem('automarkt_api').replace('/generate', '/health')
-        : 'http://127.0.0.1:8000/health',
-    SPLASH_DURATION: 4000,
-    ANIMATION_DURATION: 300,
-    TOAST_DURATION: 4000
+  API_BASE,
+  API_URL,
+  HEALTH_URL,
+  SPLASH_DURATION: 4000,
+  ANIMATION_DURATION: 300,
+  TOAST_DURATION: 4000
 };
+
+// 5) (Opcional) atualiza rótulos na UI se existirem.
+document.getElementById('backend-url')?.textContent = CONFIG.API_URL;
+document.getElementById('api-state')?.replaceChildren?.(document.createTextNode('ok'));
+
+
+
+
 
 // ===== ESTADO GLOBAL =====
 let state = {
