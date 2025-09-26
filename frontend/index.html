@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoMarkt — Conteúdo estratégico, gerado por inteligência</title>
+    
+    <!-- Preconnect para otimização -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Fontes modernas -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- GSAP para animações avançadas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- CSS customizado -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Splash Screen Avançado -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-container">
+            <!-- Logo com animação complexa -->
+            <div class="logo-container">
+                <div class="logo-core">
+                    <div class="logo-ring ring-1"></div>
+                    <div class="logo-ring ring-2"></div>
+                    <div class="logo-ring ring-3"></div>
+                    <div class="logo-center">
+                        <div class="logo-symbol">AI</div>
+                    </div>
+                </div>
+                <div class="logo-particles"></div>
+            </div>
+            
+            <!-- Título com efeito glitch -->
+            <div class="splash-title">
+                <span class="glitch-text font-display" data-text="AutoMarkt">AutoMarkt</span>
+            </div>
+            
+            <!-- Subtítulo -->
+            <div class="splash-subtitle font-mono">
+                Inicializando sistema de IA...
+            </div>
+            
+            <!-- Barra de progresso -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <div class="progress-text font-mono">0%</div>
+            </div>
+        </div>
+        
+        <!-- Efeito de escaneamento -->
+        <div class="scan-line"></div>
+        
+        <!-- Grid de fundo -->
+        <div class="grid-background"></div>
+    </div>
+
+    <!-- Canvas para efeitos 3D -->
+    <canvas id="bg-canvas"></canvas>
+    
+    <!-- Overlay de partículas -->
+    <div id="particles-overlay"></div>
+
+    <!-- Header Principal -->
+    <header class="main-header">
+        <div class="header-container">
+            <!-- Logo do header -->
+            <div class="header-logo">
+                <div class="logo-mini">
+                    <div class="logo-mini-core"></div>
+                    <div class="logo-mini-pulse"></div>
+                </div>
+                <div class="brand-info">
+                    <h1 class="brand-title">
+                        <span class="brand-text font-display">AutoMarkt</span>
+                        <span class="brand-version">v2.0</span>
+                    </h1>
+                    <p class="brand-subtitle">Conteúdo estratégico, gerado por inteligência artificial</p>
+                </div>
+            </div>
+            
+            <!-- Status indicators -->
+            <div class="status-indicators">
+                <div class="status-item">
+                    <div class="status-dot status-online"></div>
+                    <span class="status-label">Sistema Online</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot status-gpu" id="gpu-status"></div>
+                    <span class="status-label" id="gpu-label">Detectando GPU...</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot status-api" id="api-status"></div>
+                    <span class="status-label">API Ready</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-container">
+            
+            <!-- Control Panel -->
+            <section class="control-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="title-icon">⚡</span>
+                        Painel de Controle
+                    </h2>
+                    <div class="panel-actions">
+                        <button class="action-btn" id="reset-btn" title="Resetar configurações">
+                            <span class="btn-icon">↻</span>
+                        </button>
+                        <button class="action-btn" id="save-preset-btn" title="Salvar preset">
+                            <span class="btn-icon">💾</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="panel-content">
+                    <!-- Configuração Principal -->
+                    <div class="config-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Configuração Principal</h3>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="tema" class="input-label">
+                                <span class="label-text">Tema do Conteúdo</span>
+                                <span class="label-required">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <input type="text" id="tema" class="modern-input" 
+                                       placeholder="Ex: Analytics para e-commerce, Marketing digital..." 
+                                       autocomplete="off" autofocus>
+                                <div class="input-border"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="tipo" class="input-label">
+                                    <span class="label-text">Tipo de Conteúdo</span>
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="tipo" class="modern-select">
+                                        <option value="post">Post para Redes Sociais</option>
+                                        <option value="slogan">Slogan/Tagline</option>
+                                        <option value="descricao">Descrição de Produto</option>
+                                        <option value="artigo">Artigo de Blog</option>
+                                        <option value="email">Email Marketing</option>
+                                    </select>
+                                    <div class="select-arrow">▼</div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="idioma" class="input-label">
+                                    <span class="label-text">Idioma</span>
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="idioma" class="modern-select">
+                                        <option value="pt">🇧🇷 Português</option>
+                                        <option value="en">🇺🇸 English</option>
+                                        <option value="es">🇪🇸 Español</option>
+                                        <option value="fr">🇫🇷 Français</option>
+                                    </select>
+                                    <div class="select-arrow">▼</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="tom" class="input-label">
+                                    <span class="label-text">Tom de Voz</span>
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="tom" class="modern-select">
+                                        <option value="profissional">Profissional</option>
+                                        <option value="inspirador">Inspirador</option>
+                                        <option value="direto">Direto</option>
+                                        <option value="descontraido">Descontraído</option>
+                                        <option value="tecnico">Técnico</option>
+                                    </select>
+                                    <div class="select-arrow">▼</div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="objetivo" class="input-label">
+                                    <span class="label-text">Objetivo</span>
+                                </label>
+                                <div class="select-wrapper">
+                                    <select id="objetivo" class="modern-select">
+                                        <option value="awareness">Awareness</option>
+                                        <option value="conversao" selected>Conversão</option>
+                                        <option value="engajamento">Engajamento</option>
+                                        <option value="educacao">Educação</option>
+                                    </select>
+                                    <div class="select-arrow">▼</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configurações Avançadas -->
+                    <div class="config-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Configurações Avançadas</h3>
+                            <button class="toggle-btn" id="advanced-toggle">
+                                <span class="toggle-icon">▼</span>
+                            </button>
+                        </div>
+                        
+                        <div class="advanced-content" id="advanced-content">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="plataforma" class="input-label">
+                                        <span class="label-text">Plataforma</span>
+                                    </label>
+                                    <div class="select-wrapper">
+                                        <select id="plataforma" class="modern-select">
+                                            <option value="LinkedIn">LinkedIn</option>
+                                            <option value="Instagram">Instagram</option>
+                                            <option value="Twitter/X">Twitter/X</option>
+                                            <option value="Blog">Blog</option>
+                                            <option value="Landing Page">Landing Page</option>
+                                        </select>
+                                        <div class="select-arrow">▼</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label for="publico" class="input-label">
+                                        <span class="label-text">Público-alvo</span>
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="publico" class="modern-input" 
+                                               placeholder="Ex: Decisores B2B, Jovens empreendedores...">
+                                        <div class="input-border"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="comprimento_texto" class="input-label">
+                                        <span class="label-text">Comprimento do Texto</span>
+                                    </label>
+                                    <div class="select-wrapper">
+                                        <select id="comprimento_texto" class="modern-select">
+                                            <option value="curto">Curto</option>
+                                            <option value="médio" selected>Médio</option>
+                                            <option value="longo">Longo</option>
+                                        </select>
+                                        <div class="select-arrow">▼</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="keywords" class="input-label">
+                                    <span class="label-text">Palavras-chave (SEO)</span>
+                                </label>
+                                <div class="textarea-wrapper">
+                                    <textarea id="keywords" class="modern-textarea" 
+                                              placeholder="Ex: funil de vendas, CAC, LTV, marketing digital..."
+                                              rows="3"></textarea>
+                                    <div class="textarea-border"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Checkboxes modernos -->
+                            <div class="checkbox-group">
+                                <label class="modern-checkbox">
+                                    <input type="checkbox" id="cta" checked>
+                                    <span class="checkbox-mark"></span>
+                                    <span class="checkbox-label">Incluir Call-to-Action</span>
+                                </label>
+                                
+                                <label class="modern-checkbox">
+                                    <input type="checkbox" id="hashtags" checked>
+                                    <span class="checkbox-mark"></span>
+                                    <span class="checkbox-label">Incluir Hashtags</span>
+                                </label>
+                                
+                                <label class="modern-checkbox">
+                                    <input type="checkbox" id="emojis">
+                                    <span class="checkbox-mark"></span>
+                                    <span class="checkbox-label">Incluir Emojis</span>
+                                </label>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configurações de IA -->
+                    <div class="config-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Configurações de IA</h3>
+                            <button class="toggle-btn" id="ai-toggle">
+                                <span class="toggle-icon">▼</span>
+                            </button>
+                        </div>
+                        
+                        <div class="ai-content" id="ai-content">
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="provider" class="input-label">
+                                        <span class="label-text">Provider</span>
+                                    </label>
+                                    <div class="select-wrapper">
+                                        <select id="provider" class="modern-select">
+                                            <option value="groq" selected>Groq (Rápido)</option>
+                                            <option value="openai">OpenAI (GPT)</option>
+                                            <option value="anthropic">Anthropic (Claude)</option>
+                                        </select>
+                                        <div class="select-arrow">▼</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label for="model" class="input-label">
+                                        <span class="label-text">Modelo</span>
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="model" class="modern-input" 
+                                               placeholder="llama-3.3-70b-versatile">
+                                        <div class="input-border"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-row">
+                                <div class="input-group">
+                                    <label for="max-tokens" class="input-label">
+                                        <span class="label-text">Max Tokens</span>
+                                    </label>
+                                    <div class="input-wrapper">
+                                        <input type="number" id="max-tokens" class="modern-input" 
+                                               value="512" min="100" max="4000">
+                                        <div class="input-border"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="input-group">
+                                    <label for="temperature" class="input-label">
+                                        <span class="label-text">Temperature</span>
+                                    </label>
+                                    <div class="slider-wrapper">
+                                        <input type="range" id="temperature" class="modern-slider" 
+                                               min="0" max="1" step="0.1" value="0.7">
+                                        <div class="slider-value">0.7</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botões de Ação -->
+                    <div class="action-section">
+                        <button class="primary-btn" id="generate-btn">
+                            <span class="btn-icon">✨</span>
+                            <span class="btn-text">Gerar Conteúdo</span>
+                            <span class="btn-shortcut">Ctrl+Enter</span>
+                        </button>
+                        
+                        <div class="secondary-actions">
+                            <button class="secondary-btn" id="copy-md-btn">
+                                <span class="btn-icon">📋</span>
+                                <span class="btn-text">Copiar MD</span>
+                            </button>
+                            
+                            <button class="secondary-btn" id="copy-html-btn">
+                                <span class="btn-icon">🔗</span>
+                                <span class="btn-text">Copiar HTML</span>
+                            </button>
+                            
+                            <button class="secondary-btn" id="download-btn">
+                                <span class="btn-icon">💾</span>
+                                <span class="btn-text">Download</span>
+                            </button>
+                            
+                            <button class="ghost-btn" id="clear-btn">
+                                <span class="btn-icon">🗑️</span>
+                                <span class="btn-text">Limpar</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading State -->
+                    <div class="loading-section" id="loading-section" style="display: none;">
+                        <div class="loading-animation">
+                            <div class="loading-ring"></div>
+                            <div class="loading-ring"></div>
+                            <div class="loading-ring"></div>
+                        </div>
+                        <div class="loading-text">
+                            <span class="loading-message">Processando com IA...</span>
+                            <span class="loading-details">Analisando contexto e gerando conteúdo</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Output Panel -->
+            <section class="output-panel">
+                <div class="panel-header">
+                    <h2 class="panel-title">
+                        <span class="title-icon">📄</span>
+                        Resultado Gerado
+                    </h2>
+                    <div class="panel-actions">
+                        <button class="action-btn" id="fullscreen-btn" title="Tela cheia">
+                            <span class="btn-icon">⛶</span>
+                        </button>
+                        <button class="action-btn" id="export-btn" title="Exportar">
+                            <span class="btn-icon">📤</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="output-content">
+                    <div class="output-placeholder" id="output-placeholder">
+                        <div class="placeholder-icon">🤖</div>
+                        <h3 class="placeholder-title">Pronto para gerar conteúdo</h3>
+                        <p class="placeholder-text">
+                            Configure os parâmetros ao lado e clique em "Gerar Conteúdo" 
+                            para criar conteúdo estratégico com inteligência artificial.
+                        </p>
+                    </div>
+                    
+                    <div class="output-result" id="output-result" style="display: none;">
+                        <div class="result-header">
+                            <div class="result-meta">
+                                <span class="meta-item">
+                                    <span class="meta-label">Gerado em:</span>
+                                    <span class="meta-value" id="generation-time">--</span>
+                                </span>
+                                <span class="meta-item">
+                                    <span class="meta-label">Tokens:</span>
+                                    <span class="meta-value" id="token-count">--</span>
+                                </span>
+                                <span class="meta-item">
+                                    <span class="meta-label">Modelo:</span>
+                                    <span class="meta-value" id="model-used">--</span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="result-content" id="result-content">
+                            <!-- Conteúdo gerado será inserido aqui -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
