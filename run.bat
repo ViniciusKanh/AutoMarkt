@@ -1,77 +1,32 @@
 @echo off
-setlocal ENABLEDELAYEDEXPANSION
-
-rem === Configurações ===
+setlocal
+REM ===== Config =====
 set "BACKEND_PORT=8000"
 set "FRONTEND_PORT=8080"
 
-rem === Ir para a pasta do script ===
+REM Ir para a pasta do script
 cd /d "%~dp0"
 
-rem === Verifica Python ===
-python --version >nul 2>&1
-if errorlevel 1 (
-  echo [ERRO] Python nao encontrado no PATH.
-  echo Instale o Python 3.10+ e reabra o terminal.
-  pause
-  exit /b 1
-)
+REM Escolhe Python da venv se existir; se não, usa o python do sistema
+set "PY=python"
+if exist "backend\.venv\Scripts\python.exe" set "PY=backend\.venv\Scripts\python.exe"
 
-rem === Prepara venv do backend, se faltar ===
-if not exist "backend\.venv" (
-  echo [SETUP] Criando venv do backend...
-  python -m venv "backend\.venv"
-)
-
-echo [SETUP] Instalando dependencias do backend (se necessário)...
-call "backend\.venv\Scripts\activate.bat"
-python -m pip install --upgrade pip >nul
-python -m pip install -r "backend\requirements.txt"
-deactivate
-
-rem === Aviso de portas ocupadas ===
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":%BACKEND_PORT% " ^| findstr LISTENING') do set "PID_BACK=%%a"
-for /f "tokens=5" %%a in ('netstat -ano ^| findstr ":%FRONTEND_PORT% " ^| findstr LISTENING') do set "PID_FRONT=%%a"
-if defined PID_BACK echo [AVISO] Porta %BACKEND_PORT% em uso por PID !PID_BACK!
-if defined PID_FRONT echo [AVISO] Porta %FRONTEND_PORT% em uso por PID !PID_FRONT!
-
-rem === Inicia Backend (nova janela) ===
+REM === Backend (uvicorn) em nova janela ===
 start "AutoMarkt Backend" cmd /k ^
- "cd /d backend && call .venv\Scripts\activate.bat && uvicorn app:app --host 0.0.0.0 --port %BACKEND_PORT%"
+ "cd /d backend && %PY% -m uvicorn app:app --host 0.0.0.0 --port %BACKEND_PORT% --reload"
 
-rem === Pequeno atraso para o backend subir ===
-timeout /t 2 >nul
+REM Pequeno atraso (2s) só para logs ficarem limpos
+ping 127.0.0.1 -n 2 >nul
 
-rem === Inicia Frontend (nova janela) ===
+REM === Frontend (http.server) em nova janela ===
 start "AutoMarkt Frontend" cmd /k ^
  "cd /d frontend && python -m http.server %FRONTEND_PORT%"
 
-rem === Abre o navegador no frontend ===
+REM Abre o navegador no front
 start "" "http://127.0.0.1:%FRONTEND_PORT%"
 
 echo.
-echo AutoMarkt em execucao.
-echo Backend:  http://127.0.0.1:%BACKEND_PORT%
+echo Backend : http://127.0.0.1:%BACKEND_PORT%
 echo Frontend: http://127.0.0.1:%FRONTEND_PORT%
-echo.
-echo Pressione qualquer tecla para tentar encerrar servidores por porta...
-pause >nul
-
-rem === Encerrar por porta (best-effort) ===
-call :killOnPort %BACKEND_PORT%
-call :killOnPort %FRONTEND_PORT%
-
-echo Encerrado (se processos persistirem, feche as janelas "AutoMarkt Backend" e "AutoMarkt Frontend").
+echo (Feche as janelas para encerrar.)
 endlocal
-exit /b 0
-
-:killOnPort
-set "FOUND_PID="
-for /f "tokens=5" %%p in ('netstat -ano ^| findstr ":%1 " ^| findstr LISTENING') do set "FOUND_PID=%%p"
-if defined FOUND_PID (
-  echo [STOP] Matando PID !FOUND_PID! (porta %1)...
-  taskkill /PID !FOUND_PID! /F >nul 2>&1
-) else (
-  echo [STOP] Nada escutando na porta %1.
-)
-exit /b 0
