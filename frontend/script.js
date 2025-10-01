@@ -1,5 +1,16 @@
 // ===== CONFIGURAÇÕES GLOBAIS =====
-// ===== CONFIGURAÇÕES GLOBAIS =====
+
+// 0) Override via querystring ?api=...
+(() => {
+  try {
+    const u = new URL(window.location.href);
+    const qApi = (u.searchParams.get('api') || '').trim();
+    if (qApi) {
+      localStorage.setItem('automarkt_api_base', qApi);
+      // opcional: limpar o parâmetro sem recarregar — deixamos como está
+    }
+  } catch {}
+})();
 
 // 1) Compatibilidade com chave antiga: se existir automarkt_api (com /generate),
 //    converte para base e guarda em automarkt_api_base.
@@ -8,27 +19,46 @@
   if (legacy && /\/generate\/?$/.test(legacy)) {
     const base = legacy.replace(/\/generate\/?$/, '');
     localStorage.setItem('automarkt_api_base', base);
+    localStorage.removeItem('automarkt_api');
   }
 })();
 
-// 2) Define base de API preferindo o que estiver salvo; se estiver no GitHub Pages,
-//    usa por padrão o Space do HF; localmente usa 127.0.0.1.
+// 2) Helpers de normalização
+const DEFAULT_HF_BASE = 'https://viniciuskhan-automarkt-backend.hf.space'; // ajuste se necessário
+
+function sanitizeBase(url) {
+  if (!url) return '';
+  let s = String(url).trim();
+  s = s.replace(/\s+/g, '');
+
+  // se for apenas o host do Space, força https e lowercase
+  if (/^viniciuskhan-automarkt-backend\.hf\.space$/i.test(s)) {
+    s = 'https://' + s.toLowerCase();
+  }
+
+  // se for hf.space com http, troca para https
+  s = s.replace(/^http:\/\/([^/]+\.hf\.space)/i, 'https://$1');
+
+  // remove barras finais
+  s = s.replace(/\/+$/, '');
+  return s;
+}
+
+// 3) Define base de API: preferir o salvo; em GitHub Pages usar HF; local usar 127.0.0.1
 const DEFAULT_BASE = (() => {
-  const saved = (localStorage.getItem('automarkt_api_base') || '').trim();
+  const saved = sanitizeBase(localStorage.getItem('automarkt_api_base') || '');
   if (saved) return saved;
 
-  const onPages = location.hostname.endsWith('github.io');
-  return onPages
-    ? 'https://ViniciusKhan-automarkt-backend.hf.space'  // <- seu Space
-    : 'http://127.0.0.1:8000';
+  const onPages = /\.github\.io$/i.test(location.hostname);
+  return onPages ? DEFAULT_HF_BASE : 'http://127.0.0.1:8000';
 })();
 
-// 3) Normaliza e deriva endpoints.
-const API_BASE   = DEFAULT_BASE.replace(/\/+$/, '');
+// 4) Normaliza e deriva endpoints
+const API_BASE   = sanitizeBase(DEFAULT_BASE);
 const API_URL    = `${API_BASE}/generate`;
 const HEALTH_URL = `${API_BASE}/health`;
 
-// 4) Expõe config global.
+// 5) Expõe config global
 const CONFIG = {
   API_BASE,
   API_URL,
@@ -38,11 +68,19 @@ const CONFIG = {
   TOAST_DURATION: 4000
 };
 
-// 5) (Opcional) atualiza rótulos na UI se existirem.
-document.getElementById('backend-url')?.textContent = CONFIG.API_URL;
-document.getElementById('api-state')?.replaceChildren?.(document.createTextNode('ok'));
+// 6) Reflete na UI (se existir o elemento)
+const backendUrlEl = document.getElementById('backend-url');
+if (backendUrlEl) backendUrlEl.textContent = CONFIG.API_URL;
 
+// ⚠️ Não force o estado da API aqui; deixe o StatusManager testar via /health
+// document.getElementById('api-state')?.replaceChildren?.(document.createTextNode('ok'));
 
+// 7) Logs úteis em modo debug
+if (localStorage.getItem('automarkt_debug') === 'true') {
+  console.log('[CONFIG] API_BASE =', API_BASE);
+  console.log('[CONFIG] API_URL  =', API_URL);
+  console.log('[CONFIG] HEALTH   =', HEALTH_URL);
+}
 
 
 
