@@ -1,20 +1,25 @@
 # AutoMarkt — Conteúdo estratégico, gerado por inteligência
 
-AutoMarkt é um gerador de conteúdo orientado a marketing. Reúne uma interface web leve (HTML/CSS/JS) e uma API simples em Python (FastAPI), permitindo criar textos para redes sociais, slogans, descrições de produto, artigos e e-mails, com foco em praticidade: abrir o site, informar o tema e obter o conteúdo final em Markdown.
+O AutoMarkt é um gerador de conteúdo voltado a marketing. Une uma **interface web leve** (HTML/CSS/JS) e uma **API em Python (FastAPI)** para criar, de forma objetiva, textos para redes sociais, slogans, descrições de produto, artigos e e-mails. A utilização é direta: abrir o site, definir o tema e obter o resultado final em **Markdown**.
+
+> **Front-end (prod):** [https://viniciuskanh.github.io/AutoMarkt/](https://viniciuskanh.github.io/AutoMarkt/)
+> **Back-end (prod):** [https://viniciuskhan-automarkt-backend.hf.space](https://viniciuskhan-automarkt-backend.hf.space)
+> **Docs da API (Swagger):** [https://viniciuskhan-automarkt-backend.hf.space/docs](https://viniciuskhan-automarkt-backend.hf.space/docs)
 
 ---
 
 ## Sumário
 
 * [Visão geral](#visão-geral)
+* [Demonstrações](#demonstrações)
 * [Principais funcionalidades](#principais-funcionalidades)
-* [Arquitetura do projeto](#arquitetura-do-projeto)
+* [Arquitetura](#arquitetura)
 * [Requisitos](#requisitos)
 * [Como executar localmente](#como-executar-localmente)
 
   * [1) Backend (FastAPI)](#1-backend-fastapi)
-  * [2) Frontend (GitHub Pages ou servidor local)](#2-frontend-github-pages-ou-servidor-local)
-* [Variáveis de ambiente](#variáveis-de-ambiente)
+  * [2) Frontend (servidor local ou GitHub Pages)](#2-frontend-servidor-local-ou-github-pages)
+* [Variáveis de ambiente (Backend)](#variáveis-de-ambiente-backend)
 * [Estrutura de pastas](#estrutura-de-pastas)
 * [API](#api)
 
@@ -22,69 +27,87 @@ AutoMarkt é um gerador de conteúdo orientado a marketing. Reúne uma interface
   * [Geração de conteúdo](#geração-de-conteúdo)
   * [Exemplos de requisição](#exemplos-de-requisição)
 * [Personalização do front](#personalização-do-front)
-* [Publicação do frontend no GitHub Pages](#publicação-do-frontend-no-github-pages)
-* [Publicação do backend (Render/Railway)](#publicação-do-backend-renderrailway)
+* [Publicação](#publicação)
+
+  * [Frontend no GitHub Pages](#frontend-no-github-pages)
+  * [Backend no Hugging Face Spaces (Docker)](#backend-no-hugging-face-spaces-docker)
 * [Boas práticas de segurança](#boas-práticas-de-segurança)
 * [Solução de problemas](#solução-de-problemas)
+* [Contribuição](#contribuição)
+* [Licença](#licença)
 
 ---
 
 ## Visão geral
 
-O repositório oferece um fluxo direto para produzir textos de marketing:
+Fluxo de uso:
 
-1. Interface web com tema escuro, animação de abertura e partículas.
-2. Formulário com parâmetros de tom, objetivo, plataforma, público-alvo e palavras-chave.
-3. Envio de uma requisição `POST /generate` ao backend.
-4. Retorno em texto renderizado como Markdown, com botões para copiar e baixar.
+1. A interface web apresenta um **formulário** com parâmetros essenciais (tema, tipo de conteúdo, idioma, tom, objetivo, plataforma, público e palavras-chave).
+2. O front envia um `POST /generate` ao backend.
+3. A API monta o prompt e delega a provedores configurados (Groq, OpenAI ou HF Inference).
+4. O texto de volta é renderizado em **Markdown**, com opções para **copiar** ou **baixar**.
 
-O objetivo é facilitar a rotina de quem cria conteúdo, com foco em clareza e agilidade.
+O foco é **praticidade** e **clareza** para a rotina de criação de conteúdo.
+
+---
+
+## Demonstrações
+
+**Página inicial (screenshot):**
+![Início](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Inicio.png)
+
+**Vídeo (01:13):** <a href="https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Demonstratjvo.mp4" target="_blank">
+Ver demonstração em vídeo </a>
 
 ---
 
 ## Principais funcionalidades
 
-* **Interface única** (`frontend/`) com:
+**Frontend (`/frontend`)**
 
-  * Splash de abertura, partículas e micro-animações.
-  * Campos para tema, tipo de conteúdo, idioma, tom, objetivo, plataforma e SEO.
-  * Indicadores de **API** e **aceleração do navegador** (WebGPU/WASM).
-  * Renderização **Markdown** (via `marked`), com botões para copiar Markdown, copiar HTML e baixar `.md`.
-  * **Presets locais** (armazenados em `localStorage`) e atalho **Ctrl/⌘ + Enter**.
+* Tema escuro, **splash animado** e partículas.
+* Campos para **tema, tipo, idioma, tom, objetivo, plataforma, público e SEO**.
+* Indicadores de **status da API** e de **aceleração** (WebGPU/WebGL/CPU).
+* Renderização **Markdown** via `marked`, com botões **Copiar MD**, **Copiar HTML** e **Download** `.md`.
+* **Presets** armazenados em `localStorage`.
+* Atalhos: **Ctrl/⌘ + Enter** (gerar) e **ESC** (limpar/fechar tela cheia).
 
-* **API simples** (`backend/`) com:
+**Backend (`/backend`)**
 
-  * `GET /health` para verificação de disponibilidade.
-  * `POST /generate` para gerar texto conforme os parâmetros enviados.
-  * Suporte a provedores por variável de ambiente (ex.: Groq, OpenAI, Hugging Face Inference).
-  * CORS configurável para permitir chamadas do GitHub Pages.
+* FastAPI com:
+
+  * `GET /health` (verificação de disponibilidade);
+  * `POST /generate` (geração de texto);
+  * `GET /` redireciona para `/docs`.
+* Integração com **Groq**, **OpenAI** e **Hugging Face Inference** (selecionável).
+* CORS configurável via `ALLOWED_ORIGINS` para autorizar o domínio do Pages.
 
 ---
 
-## Arquitetura do projeto
+## Arquitetura
 
-* **Frontend**: HTML estático + CSS + JavaScript (sem build).
-* **Backend**: FastAPI + `httpx`.
-* **Módulos principais**:
+* **Frontend**: HTML estático + CSS + JS (sem etapa de build).
+* **Backend**: FastAPI + `httpx`, empacotado e executado em Docker no **Hugging Face Spaces**.
+* **Módulos**:
 
-  * `backend/app.py` — inicialização do FastAPI, rotas e CORS.
-  * `backend/providers.py` — integração com provedores e modelos.
-  * `backend/prompts.py` — construção do prompt a partir dos campos.
-  * `frontend/index.html`, `styles.css`, `script.js` — página, estilos e lógica do cliente.
+  * `backend/app.py`: inicialização, rotas e CORS;
+  * `backend/providers.py`: chamadas aos provedores;
+  * `backend/prompts.py`: montagem do prompt a partir dos inputs;
+  * `frontend/index.html`, `styles.css`, `script.js`: UI, estilos e integração com a API.
 
 ---
 
 ## Requisitos
 
-* **Backend**:
+**Backend**
 
-  * Python **3.10+**
-  * Dependências listadas em `backend/requirements.txt`
+* Python **3.10+** (execução local)
+* Dependências: `backend/requirements.txt`
 
-* **Frontend**:
+**Frontend**
 
-  * Navegador moderno
-  * Opcional: servidor local simples para servir os arquivos (ex.: `python -m http.server`)
+* Navegador moderno
+* Opcional: servidor local simples (`python -m http.server`)
 
 ---
 
@@ -92,73 +115,78 @@ O objetivo é facilitar a rotina de quem cria conteúdo, com foco em clareza e a
 
 ### 1) Backend (FastAPI)
 
-1. Acesse a pasta do backend:
+```bash
+cd backend
 
-   ```bash
-   cd backend
-   ```
+# Ambiente virtual
+python -m venv .venv
+# Windows
+.venv\Scripts\activate
+# Linux/macOS
+# source .venv/bin/activate
 
-2. Crie um ambiente virtual e instale dependências:
+pip install -r requirements.txt
 
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate      # Windows
-   # source .venv/bin/activate # Linux/macOS
+# Defina as variáveis (ver seção "Variáveis de ambiente")
+# Exemplo: criar backend/.env a partir de backend/.env.example
 
-   pip install -r requirements.txt
-   ```
+# Inicie o servidor
+uvicorn app:app --reload --port 8000
 
-3. Prepare suas variáveis em um arquivo `.env` (detalhes abaixo) e inicie o servidor:
+# Úteis:
+#   http://127.0.0.1:8000/health
+#   http://127.0.0.1:8000/docs
+```
 
-   ```bash
-   uvicorn app:app --reload --port 8000
-   ```
+### 2) Frontend (servidor local ou GitHub Pages)
 
-   Endereços úteis:
+**Servidor local:**
 
-   * Saúde: `http://127.0.0.1:8000/health`
-   * Docs interativas (Swagger): `http://127.0.0.1:8000/docs`
+```bash
+cd frontend
+python -m http.server 8080
+# Abra: http://127.0.0.1:8080
+```
 
-### 2) Frontend (GitHub Pages ou servidor local)
+**Apontar o front para uma API específica (sem editar arquivos):**
+Abra o console do navegador (F12) na página e faça:
 
-* **Servidor local**:
+```js
+// Backend local
+localStorage.setItem('automarkt_api_base','http://127.0.0.1:8000');
+location.reload();
 
-  ```bash
-  cd frontend
-  python -m http.server 8080
-  # Abrir: http://127.0.0.1:8080
-  ```
+// Backend em produção (HF Spaces)
+localStorage.setItem('automarkt_api_base','https://viniciuskhan-automarkt-backend.hf.space');
+location.reload();
 
-  No menu do cabeçalho, o indicador de API mostrará o status após o ping em `/health`.
-
-* **Apontar o front para uma API diferente** (sem editar arquivos):
-  Abra o console do navegador na página e defina:
-
-  ```js
-  localStorage.setItem('automarkt_api_base','https://SEU-BACKEND.onrender.com');
-  location.reload();
-  ```
+// Também é possível usar querystring, ex.:
+// https://seu-usuario.github.io/AutoMarkt/?api=https://viniciuskhan-automarkt-backend.hf.space
+```
 
 ---
 
-## Variáveis de ambiente
+## Variáveis de ambiente (Backend)
 
-O backend lê chaves por `.env` (arquivo **não** versionado) ou por variáveis do ambiente do sistema.
+O backend lê chaves via **variáveis de ambiente** (ou arquivo `.env` em desenvolvimento).
 
-**Exemplo de `backend/.env.example` (placeholders seguros):**
+**`backend/.env.example` (placeholders):**
 
 ```env
-# Exemplos de variáveis (use valores reais somente no ambiente de execução)
+# Apenas exemplos. Defina valores REAIS somente no ambiente de execução.
 GROQ_API_KEY=__DEFINA_NO_HOST__
 OPENAI_API_KEY=
 HF_API_TOKEN=
+
+# CORS: adicione os domínios autorizados (separados por vírgula)
+ALLOWED_ORIGINS=https://viniciuskanh.github.io
 ```
 
-**Observações importantes:**
+**Observações:**
 
-* Nunca publique chaves em repositório.
-* Use sempre placeholders em `.env.example`.
-* Em produção (Render/Railway), cadastre as chaves diretamente no painel da plataforma.
+* **Não** publique segredos no repositório.
+* Use placeholders em `.env.example`.
+* Em produção (Hugging Face Spaces), cadastre as variáveis em **Settings → Variables** do Space.
 
 ---
 
@@ -171,7 +199,8 @@ AutoMarkt/
 │  ├─ providers.py
 │  ├─ prompts.py
 │  ├─ requirements.txt
-│  └─ .env.example          # exemplo (sem segredos)
+│  ├─ .env.example
+│  └─ Dockerfile
 ├─ frontend/
 │  ├─ index.html
 │  ├─ styles.css
@@ -180,7 +209,7 @@ AutoMarkt/
 │  ├─ prompt_exemplo.txt
 │  └─ saida_exemplo.txt
 ├─ .github/workflows/
-│  └─ pages.yml             # opcional: deploy do front no GitHub Pages
+│  └─ pages.yml
 ├─ .gitignore
 └─ README.md
 ```
@@ -191,10 +220,7 @@ AutoMarkt/
 
 ### Saúde do serviço
 
-**`GET /health`**
-Retorna status de disponibilidade do backend e do provedor.
-
-Exemplo de resposta:
+`GET /health` — status do backend e disponibilidade de provedor:
 
 ```json
 {
@@ -205,8 +231,7 @@ Exemplo de resposta:
 
 ### Geração de conteúdo
 
-**`POST /generate`**
-Gera o texto com base nos campos enviados.
+`POST /generate` — gera o texto conforme parâmetros.
 
 **Corpo (JSON):**
 
@@ -224,6 +249,7 @@ Gera o texto com base nos campos enviados.
   "comprimento_texto": "médio",
   "incluir_cta": true,
   "incluir_hashtags": true,
+  "incluir_emojis": false,
   "keywords": "funil, CAC, LTV",
   "max_tokens": 512,
   "temperature": 0.7,
@@ -285,26 +311,30 @@ $body = @{
   max_tokens=512
   temperature=0.7
 } | ConvertTo-Json
-Invoke-RestMethod -Uri http://127.0.0.1:8000/generate -Method Post -ContentType "application/json" -Body $body
+
+Invoke-RestMethod -Uri http://127.0.0.1:8000/generate -Method Post `
+  -ContentType "application/json" -Body $body
 ```
 
 ---
 
 ## Personalização do front
 
-* **URL da API**: definida em `frontend/script.js` pela constante `API_BASE`.
-  Sem editar arquivos, pode ser trocada via `localStorage` (conforme mostrado em [Como executar localmente](#2-frontend-github-pages-ou-servidor-local)).
-* **Markdown**: a saída é renderizada com a biblioteca `marked`.
-* **Layout/tema**: ajustes visuais em `styles.css`.
-* **Animações**: o splash e as partículas estão integrados sem dependências complexas.
+* **URL da API**: definida em tempo de execução.
+
+  * `localStorage.setItem('automarkt_api_base','<SUA-API>')`
+  * Ou querystring `?api=<SUA-API>`
+* **Renderização**: saída em Markdown via `marked`.
+* **Layout/tema**: ajustes em `frontend/styles.css`.
+* **Efeitos**: splash e partículas nativas (sem build tool).
 
 ---
 
-## Publicação do frontend no GitHub Pages
+## Publicação
 
-### Com GitHub Actions (recomendado)
+### Frontend no GitHub Pages
 
-Crie `.github/workflows/pages.yml` com:
+Workflow (`.github/workflows/pages.yml`):
 
 ```yaml
 name: Deploy Frontend to GitHub Pages
@@ -331,70 +361,82 @@ jobs:
           folder: frontend
 ```
 
-Após o primeiro push:
+Depois, em **Settings → Pages**, selecione **Branch: `gh-pages`**.
 
-* Em **Settings → Pages**, selecione **Branch: `gh-pages`**.
-* A página ficará disponível em `https://SEU-USUARIO.github.io/AutoMarkt/`.
+### Backend no Hugging Face Spaces (Docker)
 
----
+O backend está hospedado em: **`ViniciusKhan/automarkt-backend`**
+**URL pública:** [https://viniciuskhan-automarkt-backend.hf.space](https://viniciuskhan-automarkt-backend.hf.space)
 
-## Publicação do backend (Render/Railway)
+**Pontos-chave do Space:**
 
-Exemplo **Render**:
+* **Porta:** 7860 (o Space expõe essa porta)
+* **Arquivo:** `backend/Dockerfile`
+* **Comando:** `uvicorn app:app --host 0.0.0.0 --port 7860`
+* **Variáveis:** `GROQ_API_KEY`, `OPENAI_API_KEY`, `HF_API_TOKEN`, `ALLOWED_ORIGINS`
 
-* **Root Directory**: `backend`
-* **Build Command**: `pip install -r requirements.txt`
-* **Start Command**: `uvicorn app:app --host 0.0.0.0 --port $PORT`
-* **Environment Variables**:
+Exemplo de `Dockerfile` (já no projeto):
 
-  * `GROQ_API_KEY` (ou `OPENAI_API_KEY`, `HF_API_TOKEN`)
+```dockerfile
+FROM python:3.12-slim
 
-No `backend/app.py`, configure CORS para seu domínio do Pages:
+ENV PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    HOST=0.0.0.0 \
+    PORT=7860
 
-```python
-from fastapi.middleware.cors import CORSMiddleware
+WORKDIR /app
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["https://SEU-USUARIO.github.io"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-```
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-Depois, no navegador (no site do Pages):
-
-```js
-localStorage.setItem('automarkt_api_base','https://SEU-BACKEND.onrender.com');
-location.reload();
+COPY . .
+CMD ["uvicorn","app:app","--host","0.0.0.0","--port","7860"]
 ```
 
 ---
 
 ## Boas práticas de segurança
 
-* **Nunca** versionar arquivos com chaves reais (`backend/.env` está no `.gitignore`).
-* Manter `backend/.env.example` apenas com placeholders.
-* Em caso de alerta de “Push Protection” no GitHub, remover o segredo do histórico antes de publicar novamente.
-* Em produção, cadastrar as chaves **somente** nas variáveis de ambiente da plataforma de hospedagem.
+* Nunca versionar chaves reais (`.env` está no `.gitignore`).
+* Usar placeholders em `.env.example`.
+* Ao publicar no GitHub, caso ocorra **Push Protection** por segredo detectado, remover o segredo do histórico e refazer o push.
+* Em produção, manter as chaves apenas em **variáveis de ambiente** da plataforma.
 
 ---
 
 ## Solução de problemas
 
-* **`/` retorna 404**: a raiz não possui rota. Usar `/health` e `/docs`.
-* **`API: Indisponível` no cabeçalho**: verifique `HEALTH_URL`; confirme que o backend está online.
-* **CORS no console**: conferir `allow_origins` no FastAPI com o domínio do Pages.
-* **401/403 ao gerar**: revisar variáveis de ambiente (chaves ausentes/invalidas).
-* **Mixed Content**: se o front estiver em HTTPS (Pages), o backend também precisa estar em HTTPS.
-* **Texto “cortado”**: aumentar `max_tokens` (ex.: 512 ou 1024) e, se necessário, reenviar com o mesmo tema.
-* **CRLF/LF no Windows**: usar `.gitattributes` para normalizar finais de linha.
-* **Push Protection**: remover segredos do histórico; em seguida, `git push --force-with-lease` se optar por reescrever o histórico.
+* **`/` retorna 404**: acesse `/docs` ou `/health`. (No Space, `/` já redireciona para `/docs`.)
+* **Indicador “API Offline”**: verifique se o `/health` responde e se a URL em `automarkt_api_base` está correta.
+* **CORS no console**: inclua o domínio do Pages em `ALLOWED_ORIGINS`.
+* **Mixed Content**: front em HTTPS exige backend também em HTTPS.
+* **Conteúdo cortado**: aumente `max_tokens` (ex.: 512/1024) e reenvie.
+* **CRLF/LF no Windows**: normalize finais de linha via `.gitattributes`.
+* **Timeout**: confirme tempo de resposta do `/generate` (e rede do host).
 
 ---
 
-Sugestões podem ser enviadas por issues.
+## Contribuição
+
+* Abertura de **issues** com descrição objetiva e passos de reprodução.
+* Sugestões de UX/UI, novos tipos de conteúdo e presets são bem-vindas.
+* Pull Requests devem manter o padrão do projeto (simples, direto e com comentários claros).
 
 ---
 
+## Licença
+
+Definir conforme necessidade do repositório (ex.: MIT). Caso não haja um arquivo `LICENSE`, recomenda-se adicionar um.
+
+---
+
+**Links rápidos**
+
+* Frontend (prod): [https://viniciuskanh.github.io/AutoMarkt/](https://viniciuskanh.github.io/AutoMarkt/)
+* Backend (prod): [https://viniciuskhan-automarkt-backend.hf.space](https://viniciuskhan-automarkt-backend.hf.space)
+* API Docs: [https://viniciuskhan-automarkt-backend.hf.space/docs](https://viniciuskhan-automarkt-backend.hf.space/docs)
+* Vídeo (01:13): [https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Demonstratjvo.mp4](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Demonstratjvo.mp4)
+* Screenshot: [https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Inicio.png](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Inicio.png)
+
+---
