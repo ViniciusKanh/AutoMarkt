@@ -1,10 +1,16 @@
 # AutoMarkt — Conteúdo estratégico, gerado por inteligência
 
+![Início](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Inicio.png?raw=true)
+
+
 O AutoMarkt é um gerador de conteúdo voltado a marketing. Une uma **interface web leve** (HTML/CSS/JS) e uma **API em Python (FastAPI)** para criar, de forma objetiva, textos para redes sociais, slogans, descrições de produto, artigos e e-mails. A utilização é direta: abrir o site, definir o tema e obter o resultado final em **Markdown**.
 
 > **Front-end (prod):** [https://viniciuskanh.github.io/AutoMarkt/](https://viniciuskanh.github.io/AutoMarkt/)
 > **Back-end (prod):** [https://viniciuskhan-automarkt-backend.hf.space](https://viniciuskhan-automarkt-backend.hf.space)
 > **Docs da API (Swagger):** [https://viniciuskhan-automarkt-backend.hf.space/docs](https://viniciuskhan-automarkt-backend.hf.space/docs)
+
+![Tela Inicial](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Tela%20Inicial.gif?raw=true)
+
 
 ---
 
@@ -56,8 +62,7 @@ O foco é **praticidade** e **clareza** para a rotina de criação de conteúdo.
 **Página inicial (screenshot):**
 ![Início](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Inicio.png)
 
-**Vídeo (01:13):** <a href="https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Demonstratjvo.mp4" target="_blank">
-Ver demonstração em vídeo </a>
+![Gerando Conteúdo](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Gerando%20Conteudo.gif?raw=true)
 
 ---
 
