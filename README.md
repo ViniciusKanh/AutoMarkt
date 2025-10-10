@@ -436,7 +436,4 @@ Definir conforme necessidade do repositório (ex.: MIT). Caso não haja um arqui
 * Frontend (prod): [https://viniciuskanh.github.io/AutoMarkt/](https://viniciuskanh.github.io/AutoMarkt/)
 * Backend (prod): [https://viniciuskhan-automarkt-backend.hf.space](https://viniciuskhan-automarkt-backend.hf.space)
 * API Docs: [https://viniciuskhan-automarkt-backend.hf.space/docs](https://viniciuskhan-automarkt-backend.hf.space/docs)
-* Vídeo (01:13): [https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Demonstratjvo.mp4](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Demonstratjvo.mp4)
-* Screenshot: [https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Inicio.png](https://github.com/ViniciusKanh/AutoMarkt/blob/main/img/Inicio.png)
-
 ---
